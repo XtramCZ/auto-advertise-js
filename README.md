@@ -1,4 +1,4 @@
-## AutoAd
+## AutoAd.js
 
 AutoAd is a tool for auto advertising your services in discord market channels.
 
@@ -17,4 +17,4 @@ npm i discord.js-selfbot-v13 node-config-yaml colors
 
 ### Troubleshooting
 If you have some issues you can enable debug mode in config. It will show every message being sent to find the issue.
-If that doesn't work you can start an [issue](https://github.com/XtramCZ/auto-advertise-js/issues)
+If that doesn't work you can start an [issue](https://github.com/XtramCZ/auto-advertise-js/issues).
