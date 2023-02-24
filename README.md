@@ -6,7 +6,7 @@ AutoAd is a tool for auto advertising your services in discord market channels.
 
 ## Installation
 ```bash
-npm i discord.js-selfbot-v13 node-config-yaml colors
+npm i discord.js-selfbot-v13 node-yaml-config colors
 ```
 
 ## Usage
