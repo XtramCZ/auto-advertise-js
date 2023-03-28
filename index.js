@@ -31,8 +31,9 @@ async function sendMessage() {
   for (let i = 0; i < config.channels.length; i++) {
     const channel = client.channels.cache.get(config.channels[i])
     try {
-      await channel.send(message)
+      channel.send(message).then(() => {
       config.debug_mode == 'true' ? console.log(` > A message was sent to "${channel.name}" in "${channel.guild.name}"`) : null
+      })
     } catch (err) {
       console.log(color.red(` > There was a problem sending a message to ${channel.name} in ${channel.guild.name}`))
     }
