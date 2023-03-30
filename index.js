@@ -24,7 +24,7 @@ async function sendToChannel(channel_id, message){
       'Authorization': config.token,
       'Content-Type': 'application/json'
     }
-    }).then(res => {console.log(res)})
+    })
 }
 
 console.clear()
