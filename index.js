@@ -45,16 +45,16 @@ async function sendMessage() {
     const channel = client.channels.cache.get(config.channels[i])
     try {
       await sendToChannel(config.channels[i], message).then(() => {
-      config.debug_mode == 'true' ? console.log(` > A message was sent to "${channel.name ? channel.name : "Unknown channel"}" in "${channel.guild.name ? channel.guild.name : "Unknown guild"}"`) : null
+      config.debug_mode == 'true' ? console.log(` > A message was sent to "${channel.name ? channel.name : config.channels[i]}" in "${channel.guild.name ? channel.guild.name : "Unknown guild"}"`) : null
       })
     } catch (err) {
       var code = err.response.data.code
       if(code == 50013){ // If the error is "Missing Permissions"
-        console.log(color.red(` > There was a problem sending a message to "${channel.name ? channel.name : "Unknown channel"}" in "${channel.guild.name ? channel.guild.name : "Unknown guild"}" (MUTED)`))
+        console.log(color.red(` > There was a problem sending a message to "${channel.name ? channel.name : config.channels[i]}" in "${channel.guild.name ? channel.guild.name : "Unknown guild"}" (MUTED)`))
       } else if(code == 20016){ // If the error is because of cooldown
         continue
       } else {
-      console.log(color.red(` > There was a problem sending a message to "${channel.name ? channel.name : "Unknown channel"}" in "${channel.guild.name ? channel.guild.name : "Unknown guild"}"`))
+      console.log(color.red(` > There was a problem sending a message to "${channel.name ? channel.name : config.channels[i]}" in "${channel.guild.name ? channel.guild.name : "Unknown guild"}"`))
       }
       continue
     }
