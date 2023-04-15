@@ -1,12 +1,16 @@
 default:
-  token: 'your token here'
+  token: 'put your token here'
   interval: 60 # How many minutes to wait before sending another batch of messages (Default: 60)
 
   # This setting overrides the 'interval' value set above
-  randomize_delay:
-    enabled: false  # If set to true, your delay is randomized based on the values below (Default: false)
-    minimum_delay: 60 # Minimum delay in minutes (Default: 60)
-    maximum_delay: 70 # Maximum delay in minutes (Default: 70)
+  randomize_interval:
+    enabled: false  # If set to true, your interval is randomized based on the values below (Default: false)
+    minimum_interval: 60 # Minimum interval in minutes (Default: 60)
+    maximum_interval: 70 # Maximum interval in minutes (Default: 70)
+
+  avoid_spam:
+    enabled: false # If set to true, the script prevents double-posting, but makes your interval longer (Default: false)
+    messages: 2 # How many messages other people post before you repost yours. For speed, don't set it more than 5 (Default: 2)
 
   wait_before_start: 0 # How many minutes to wait before starting the script (Default: 0)
   debug_mode: false # If set to true, you will get a log in the console every time a message is sent (Default: false)
