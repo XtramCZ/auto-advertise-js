@@ -51,12 +51,23 @@ async function sendToChannel(channel_id, message, channel_name, guild_name){
     }
   }
   // Post the message to the API
-  await axios.post(`https://discord.com/api/v9/channels/${channel_id}/messages`, {
-    content: message
-    }, 
-    headers
-  )
+  try {
+    await axios.post(`https://discord.com/api/v9/channels/${channel_id}/messages`, {
+      content: message
+      }, 
+      headers
+    )
   config.debug_mode ? console.log(` > A message was sent to "${channel_name}" in "${guild_name}"`) : null
+  } catch (err) {
+    var code = err.response.data.code
+    if(code == 50013){ // If the error is "Missing Permissions"
+      console.log(color.red(` > There was a problem sending a message to "${channel_name}" in "${guild_name}" (MUTED)`))
+    } else if(code == 20016){ // If the error is because of cooldown
+      return
+    } else {
+    console.log(color.red(`> There was a problem sending a message to "${channel_name}" in "${guild_name}"`));
+    }
+  }
 }
 
 console.clear()
@@ -80,20 +91,7 @@ async function sendMessage() {
   for (let i = 0; i < config.channels.length; i++) {
     // Get the channel info used in logs
     const { channel_name, guild_name } = await getChannelInfo(config.channels[i])
-    try {
-      sendToChannel(config.channels[i], message, channel_name, guild_name).then(() => {
-      })
-    } catch (err) {
-      var code = err.response.data.code
-      if(code == 50013){ // If the error is "Missing Permissions"
-        console.log(color.red(` > There was a problem sending a message to "${channel_name}" in "${guild_name}" (MUTED)`))
-      } else if(code == 20016){ // If the error is because of cooldown
-        continue
-      } else {
-      console.log(color.red(`> There was a problem sending a message to "${channel_name}" in "${guild_name}"`));
-      }
-      continue
-    }
+    sendToChannel(config.channels[i], message, channel_name, guild_name)
   }
 
   // Wait the specified time and repeat the function
@@ -105,7 +103,7 @@ async function sendMessage() {
       config.debug_mode ? console.log(color.blue(` > Waiting ${delay} minutes...`)) : null
     }
   }
-  setTimeout(sendMessage, delay * 600000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
+  setTimeout(sendMessage, delay * 60000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
 }
 
 
