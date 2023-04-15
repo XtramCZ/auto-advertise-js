@@ -1,7 +1,15 @@
 default:
-  token: 'put your token here'
-  interval: '60' # How much minutes to wait before sending another batch of messages (Default: 60)
-  debug_mode: 'false' # If set to true, you will get a log in the console every time a message is sent (Default: false)
+  token: 'your token here'
+  interval: 60 # How many minutes to wait before sending another batch of messages (Default: 60)
+
+  # This setting overrides the 'interval' value set above
+  randomize_delay:
+    enabled: false  # If set to true, your delay is randomized based on the values below (Default: false)
+    minimum_delay: 60 # Minimum delay in minutes (Default: 60)
+    maximum_delay: 70 # Maximum delay in minutes (Default: 70)
+
+  wait_before_start: 0 # How many minutes to wait before starting the script (Default: 0)
+  debug_mode: false # If set to true, you will get a log in the console every time a message is sent (Default: false)
   channels: # Channels where to send the message
     - 'xxxxxxxxxxxxxxxxxxx'
     - 'xxxxxxxxxxxxxxxxxxx' # etc
