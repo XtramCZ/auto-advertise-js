@@ -105,7 +105,7 @@ async function sendMessage() {
       config.debug_mode ? console.log(color.blue(` > Waiting ${delay} minutes...`)) : null
     }
   }
-  setTimeout(sendMessage, delay * 600000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
+  setTimeout(sendMessage, delay * 60000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
 }
 
 
