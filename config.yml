@@ -9,7 +9,7 @@ default:
     maximum_interval: 70 # Maximum interval in minutes (Default: 70)
 
   avoid_spam:
-    enabled: false # If set to true, the script prevents double-posting, but makes your interval longer (Default: false)
+    enabled: false # If set to true, the script prevents double-posting (Default: false)
     # Set both minimum and maximum to the same number if you want to only post when that number is reached, and not randomize
     minimum_messages: 2 # Minimum amount of messages other people post before you repost yours. (Default: 2)
     maximum_messages: 2 # Maximum amount of messages other people post before you repost yours. (Default: 2)
