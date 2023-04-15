@@ -10,7 +10,9 @@ default:
 
   avoid_spam:
     enabled: false # If set to true, the script prevents double-posting, but makes your interval longer (Default: false)
-    messages: 2 # How many messages other people post before you repost yours. For speed, don't set it more than 5 (Default: 2)
+    # Set both minimum and maximum to the same number if you want to only post when that number is reached, and not randomize
+    minimum_messages: 2 # Minimum amount of messages other people post before you repost yours. (Default: 2)
+    maximum_messages: 2 # Maximum amount of messages other people post before you repost yours. (Default: 2)
 
   wait_before_start: 0 # How many minutes to wait before starting the script (Default: 0)
   debug_mode: false # If set to true, you will get a log in the console every time a message is sent (Default: false)

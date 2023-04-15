@@ -45,9 +45,10 @@ async function checkDoublePosting(channel_id, number){
 async function sendToChannel(channel_id, message, channel_name, guild_name){
   // Check if you double-post / spam
   if(config.avoid_spam.enabled){
-    var can_post = await checkDoublePosting(channel_id, config.avoid_spam.messages)
+    amount = Math.floor(Math.random() * (config.avoid_spam.maximum_messages - config.avoid_spam.minimum_messages)) + config.avoid_spam.minimum_messages
+    var can_post = await checkDoublePosting(channel_id, amount)
     if (!can_post){
-      return config.debug_mode ? console.log(` > Skipping "${channel_name}" in "${guild_name}" because you have "avoid_spam" enabled`) : null
+      return config.debug_mode ? console.log(` > Skipping "${channel_name}" in "${guild_name}" because you have "avoid_spam" enabled (${amount} messages)`) : null
     }
   }
   // Post the message to the API
@@ -99,7 +100,7 @@ async function sendMessage() {
 
   if(config.randomize_interval.enabled){
     if(!(config.randomize_interval.minimum_interval > config.randomize_interval.maximum_interval)){
-      delay = Math.floor(Math.random() * (config.randomize_interval.maximum_interval - config.randomize_interval.minimum_interval)) + config.randomize_interval.minimum_interval;
+      delay = Math.floor(Math.random() * (config.randomize_interval.maximum_interval - config.randomize_interval.minimum_interval)) + config.randomize_interval.minimum_interval
       config.debug_mode ? console.log(color.blue(` > Waiting ${delay} minutes...`)) : null
     }
   }
@@ -113,7 +114,6 @@ async function start(){
     console.log()
     console.log(color.green(' > Token is valid!'))
     user_id = user.data.id
-    console.log() 
     // Wait before starting
     config.wait_before_start > 0 ? console.log(` > Waiting ${config.wait_before_start} minutes before starting...`) : null
     await sleep(config.wait_before_start * 60000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
