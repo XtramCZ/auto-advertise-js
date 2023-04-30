@@ -6,7 +6,7 @@ const yaml_config = require('node-yaml-config');
 var config = yaml_config.load('config.yml');
 var user_id = ''
 
-function sleep(ms) {
+async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -15,6 +15,10 @@ function syncReadFile(filename) {
   return content
 }
 
+function randomNumber(min, max){
+  result = Math.floor(Math.random() * (max - min)) + min
+  return result
+}
 const headers = {
   headers: {
     'Authorization': config.token,
@@ -45,7 +49,7 @@ async function checkDoublePosting(channel_id, number){
 async function sendToChannel(channel_id, message, channel_name, guild_name){
   // Check if you double-post / spam
   if(config.avoid_spam.enabled){
-    amount = Math.floor(Math.random() * (config.avoid_spam.maximum_messages - config.avoid_spam.minimum_messages)) + config.avoid_spam.minimum_messages
+    amount = randomNumber(config.avoid_spam.maximum_messages, config.avoid_spam.minimum_messages)
     var can_post = await checkDoublePosting(channel_id, amount)
     if (!can_post){
       return config.debug_mode ? console.log(` > Skipping "${channel_name}" in "${guild_name}" because you have "avoid_spam" enabled (${amount} messages)`) : null
@@ -94,6 +98,12 @@ async function sendMessage() {
     try {
       const { channel_name, guild_name } = await getChannelInfo(config.channels[i])
       sendToChannel(config.channels[i], message, channel_name, guild_name)
+
+      if(config.wait_between_messages.enabled){
+        wait_time = randomNumber(config.wait_between_messages.maximum_interval, config.wait_between_messages.minimum_interval)
+        await sleep(wait_time * 1000)
+      }
+      
     } catch {
       console.log(color.red(`> There was a problem sending a message to "${config.channels[i]}"`))
     }
@@ -104,7 +114,7 @@ async function sendMessage() {
 
   if(config.randomize_interval.enabled){
     if(!(config.randomize_interval.minimum_interval > config.randomize_interval.maximum_interval)){
-      delay = Math.floor(Math.random() * (config.randomize_interval.maximum_interval - config.randomize_interval.minimum_interval)) + config.randomize_interval.minimum_interval
+      delay = randomNumber(config.randomize_interval.maximum_interval, config.randomize_interval.minimum_interval)
       config.debug_mode ? console.log(color.blue(` > Waiting ${delay} minutes...`)) : null
     }
   }

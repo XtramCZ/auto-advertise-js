@@ -8,6 +8,11 @@ default:
     minimum_interval: 60 # Minimum interval in minutes (Default: 60)
     maximum_interval: 70 # Maximum interval in minutes (Default: 70)
 
+  wait_between_messages:
+    enabled: false # If set to true, the script waits between individual messages (Default: true)
+    minimum_interval: 3 # Maximum interval in seconds (Default: 3)
+    maximum_interval: 5 # Maximum interval in seconds (Default: 5)
+
   avoid_spam:
     enabled: false # If set to true, the script prevents double-posting (Default: false)
     # Set both minimum and maximum to the same number if you want to only post when that number is reached, and not randomize
