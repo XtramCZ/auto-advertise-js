@@ -39,7 +39,7 @@ async function getChannelInfo(channel_id){
 async function checkDoublePosting(channel_id, number){
   const response = await axios.get(`https://discord.com/api/v9/channels/${channel_id}/messages?limit=${number}`, headers)
   for(let i = 0; i < number; i++){
-    if(response.data[i].author.id == user_id){
+    if(response.data[i] && response.data[i].author.id && response.data[i].author.id == user_id){
       return false
     }
   }
