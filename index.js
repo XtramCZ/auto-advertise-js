@@ -5,6 +5,12 @@ const yaml_config = require('node-yaml-config');
 
 var config = yaml_config.load('config.yml');
 var user_id = ''
+const headers = {
+  headers: {
+    'Authorization': config.token,
+    'Content-Type': 'application/json'
+  }
+}
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -19,12 +25,41 @@ function randomNumber(min, max){
   result = Math.floor(Math.random() * (max - min)) + min
   return result
 }
-const headers = {
-  headers: {
-    'Authorization': config.token,
-    'Content-Type': 'application/json'
+
+function getWorkHours(){
+  if(config.work_hours.enabled){
+    global.start_time = new Date()
+    global.end_time = new Date()
+
+    start_time.setHours(config.work_hours.start_time, randomNumber(0, 59), 0, 0)
+    end_time.setHours(config.work_hours.end_time-1, randomNumber(0, 59), 0, 0)
   }
 }
+
+let offline = false
+async function checkWorkTime() {
+  return new Promise((resolve) => {
+    const now = new Date();
+    // If time now is before start time or after end time
+    if (
+      now.getHours() < global.start_time.getHours() ||
+      (now.getHours() === global.start_time.getHours() && now.getMinutes() < global.start_time.getMinutes()) ||
+      now.getHours() > global.end_time.getHours() ||
+      (now.getHours() === global.end_time.getHours() && now.getMinutes() > global.end_time.getMinutes())
+    ) {
+      if (!offline) {
+        console.log(color.blue(` > Going offline until ${global.start_time.getHours()}:${global.start_time.getMinutes()}`));
+        offline = true;
+      }
+      setTimeout(() => {
+        checkWorkTime().then(resolve);
+      }, 300000); // Check again after 5 minutes
+    } else {
+      resolve();
+    }
+  });
+}
+
 
 async function getChannelInfo(channel_id){
   const channel = await axios.get(`https://discord.com/api/v9/channels/${channel_id}`, headers)
@@ -70,7 +105,7 @@ async function sendToChannel(channel_id, message, channel_name, guild_name){
     } else if(code == 20016){ // If the error is because of cooldown
       return
     } else {
-     console.log(color.red(`> There was a problem sending a message to "${channel_name}" in "${guild_name}"`));
+     console.log(` > There was a problem sending a message to "${channel_name}" in "${guild_name}"`)
     }
   }
 }
@@ -79,7 +114,7 @@ console.clear()
 
 // Don't skid plz thx
 
-process.title = "Made by XtramCZ"
+process.title = "Auto Advertiser - Made by XtramCZ"
 console.log(color.red(`
      █████╗ ██╗   ██╗████████╗ ██████╗      █████╗ ██████╗ 
     ██╔══██╗██║   ██║╚══██╔══╝██╔═══██╗    ██╔══██╗██╔══██╗
@@ -92,7 +127,11 @@ console.log(color.red(`
 )
 
 const message = syncReadFile('./message.txt')
-async function sendMessage() {
+async function sendMessages() {
+  if(config.work_hours.enabled){
+    getWorkHours();
+    await checkWorkTime()
+  }
   for (let i = 0; i < config.channels.length; i++) {
     // Get the channel info used in logs
     try {
@@ -118,7 +157,7 @@ async function sendMessage() {
       config.debug_mode ? console.log(color.blue(` > Waiting ${delay} minutes...`)) : null
     }
   }
-  setTimeout(sendMessage, delay * 60000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
+  setTimeout(sendMessages, delay * 60000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
 }
 
 
@@ -133,9 +172,7 @@ async function start(){
     await sleep(config.wait_before_start * 60000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
     // Start the loop
     console.log()
-    console.log(color.blue(' > Sending first batch of messages...'))
-    console.log()
-    sendMessage()
+    await sendMessages()
   } catch (error) {
     console.log()
     console.error(color.red(' > Token is invalid!'));
