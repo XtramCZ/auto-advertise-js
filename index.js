@@ -1,6 +1,6 @@
 const axios = require('axios');
 const color = require('colors');
-const {readFileSync} = require('fs');
+const {readFileSync, readdirSync} = require('fs');
 const yaml_config = require('node-yaml-config');
 
 var config = yaml_config.load('config.yml');
@@ -42,9 +42,13 @@ async function checkWorkTime() {
     const now = new Date();
     // If time now is before start time or after end time
     if (
+      // if the hours now are lower than start time
       now.getHours() < global.start_time.getHours() ||
+      // if the hour is the same as start time, but minutes now are lower
       (now.getHours() === global.start_time.getHours() && now.getMinutes() < global.start_time.getMinutes()) ||
+      // if the time is after end time
       now.getHours() > global.end_time.getHours() ||
+      // if the hours is the same as end time, but minutes are higher
       (now.getHours() === global.end_time.getHours() && now.getMinutes() > global.end_time.getMinutes())
     ) {
       if (!offline) {
@@ -125,9 +129,21 @@ console.log(color.red(`
 
     `), 'by XtramCZ'
 )
-
-const message = syncReadFile('./message.txt')
+var last_message = ""
 async function sendMessages() {
+  let message
+  if(config.multiple_messages){
+    let message_folder = readdirSync('messages')
+    if(message_folder.length > 1){
+      message_folder.splice(message_folder.indexOf(last_message), 1)
+    }
+    let message_file = message_folder[Math.floor(Math.random() * message_folder.length)]
+    message = syncReadFile('messages/' + message_file)
+    last_message = message_file
+  } else {
+    message = syncReadFile("message.txt")
+  }
+
   if(config.work_hours.enabled){
     getWorkHours();
     await checkWorkTime()
@@ -164,20 +180,20 @@ async function sendMessages() {
 async function start(){
   try {
     var user = await axios.get('https://discord.com/api/v9/users/@me', headers)
-    console.log()
-    console.log(color.green(' > Token is valid!'))
-    user_id = user.data.id
-    // Wait before starting
-    config.wait_before_start > 0 ? console.log(` > Waiting ${config.wait_before_start} minutes before starting...`) : null
-    await sleep(config.wait_before_start * 60000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
-    // Start the loop
-    console.log()
-    await sendMessages()
   } catch (error) {
     console.log()
     console.error(color.red(' > Token is invalid!'));
     process.exit(1)
   }
+  console.log()
+  console.log(color.green(' > Token is valid!'))
+  user_id = user.data.id
+  // Wait before starting
+  config.wait_before_start > 0 ? console.log(` > Waiting ${config.wait_before_start} minutes before starting...`) : null
+  await sleep(config.wait_before_start * 60000) // Change 60000 to 1000 for testing (makes the interval seconds instead of minutes)
+  // Start the loop
+  console.log()
+  await sendMessages()
 }
 
 start()
