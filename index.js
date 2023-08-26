@@ -31,7 +31,9 @@ function getWorkHours(){
     global.start_time = new Date()
     global.end_time = new Date()
 
+    // set the work hours
     start_time.setHours(config.work_hours.start_time, randomNumber(0, 59), 0, 0)
+    // set the time an hour less but add random minutes
     end_time.setHours(config.work_hours.end_time-1, randomNumber(0, 59), 0, 0)
   }
 }
@@ -69,8 +71,8 @@ async function getChannelInfo(channel_id){
   const channel = await axios.get(`https://discord.com/api/v9/channels/${channel_id}`, headers)
   const guild = await axios.get(`https://discord.com/api/v9/guilds/${channel.data.guild_id}`, headers)
 
-  channel_name = channel.data && channel.data.name ? channel.data.name : channel_id 
-  guild_name = guild.data && guild.data.name ? guild.data.name : "Unknown guild"
+  channel_name = channel.data?.name ?? channel_id
+  guild_name = guild.data?.name ?? "Unknown guild"
 
   return {channel_name, guild_name}
 }
@@ -78,7 +80,8 @@ async function getChannelInfo(channel_id){
 async function checkDoublePosting(channel_id, number){
   const response = await axios.get(`https://discord.com/api/v9/channels/${channel_id}/messages?limit=${number}`, headers)
   for(let i = 0; i < number; i++){
-    if(response.data[i] && response.data[i].author.id && response.data[i].author.id == user_id){
+    // if any of the last x messages are posted by you
+    if(response.data[i]?.author.id == user_id){
       return false
     }
   }
@@ -135,8 +138,10 @@ async function sendMessages() {
   if(config.multiple_messages){
     let message_folder = readdirSync('messages')
     if(message_folder.length > 1){
+      // remove the last message from the choices to avoid repeating
       message_folder.splice(message_folder.indexOf(last_message), 1)
     }
+    // choose a random message file
     let message_file = message_folder[Math.floor(Math.random() * message_folder.length)]
     message = syncReadFile('messages/' + message_file)
     last_message = message_file
@@ -146,15 +151,17 @@ async function sendMessages() {
 
   if(config.work_hours.enabled){
     getWorkHours();
+    // check if offline, and if yes, block the code until work hours
     await checkWorkTime()
   }
   for (let i = 0; i < config.channels.length; i++) {
-    // Get the channel info used in logs
     try {
+      // Get the channel info used in logs
       const { channel_name, guild_name } = await getChannelInfo(config.channels[i])
-      sendToChannel(config.channels[i], message, channel_name, guild_name)
-
+      sendToChannel(config.channels[i], message, channel_name, guild_name
+                    
       if(config.wait_between_messages.enabled){
+        // wait between individual messages
         wait_time = randomNumber(config.wait_between_messages.maximum_interval, config.wait_between_messages.minimum_interval)
         await sleep(wait_time * 1000)
       }
@@ -168,6 +175,7 @@ async function sendMessages() {
   var delay = config.interval
 
   if(config.randomize_interval.enabled){
+    // randomize the delay if it's enabled
     if(!(config.randomize_interval.minimum_interval > config.randomize_interval.maximum_interval)){
       delay = randomNumber(config.randomize_interval.maximum_interval, config.randomize_interval.minimum_interval)
       config.debug_mode ? console.log(color.blue(` > Waiting ${delay} minutes...`)) : null
