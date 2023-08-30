@@ -99,12 +99,33 @@ async function sendToChannel(channel_id, message, channel_name, guild_name){
   }
   // Post the message to the API
   try {
-    await axios.post(`https://discord.com/api/v9/channels/${channel_id}/messages`, {
-      content: message
-      }, 
-      headers
-    )
-  config.debug_mode ? console.log(` > A message was sent to "${channel_name}" in "${guild_name}"`) : null
+
+    // Check if there's multiple messages
+    if(Array.isArray(message)){
+
+      // copy the array
+      let messages = [...message]
+      while(messages.length > 0){
+        // Post the message
+        await axios.post(`https://discord.com/api/v9/channels/${channel_id}/messages`, {
+          content: syncReadFile('messages/' + messages[0])
+          }, 
+          headers
+        )
+        // Remove the first item
+        messages.shift()
+      }
+
+    // else
+    } else {
+      // Post the message
+      await axios.post(`https://discord.com/api/v9/channels/${channel_id}/messages`, {
+        content: message
+        }, 
+        headers
+      )
+    }
+    config.debug_mode ? console.log(` > A message was sent to "${channel_name}" in "${guild_name}"`) : null
   } catch (err) {
     var code = err.response.data.code
     if(code == 50013){ // If the error is "Missing Permissions"
@@ -112,7 +133,7 @@ async function sendToChannel(channel_id, message, channel_name, guild_name){
     } else if(code == 20016){ // If the error is because of cooldown
       return
     } else {
-     console.log(` > There was a problem sending a message to "${channel_name}" in "${guild_name}"`)
+     console.log(color.red(` > There was a problem sending a message to "${channel_name}" in "${guild_name}"`))
     }
   }
 }
@@ -134,17 +155,26 @@ console.log(color.red(`
 )
 var last_message = ""
 async function sendMessages() {
-  let message
-  if(config.multiple_messages){
-    let message_folder = readdirSync('messages')
-    if(message_folder.length > 1){
-      // remove the last message from the choices to avoid repeating
-      message_folder.splice(message_folder.indexOf(last_message), 1)
+  let message;
+  if(config.multiple_messages.enabled){
+    var message_folder = readdirSync('messages')
+
+    // If the mode is 0 (random messages)
+    if(config.multiple_messages.mode == 0){
+      if(message_folder.length > 1){
+        // remove the last message from the choices to avoid repeating
+        message_folder.splice(message_folder.indexOf(last_message), 1)
+      }
+      // choose a random message file
+      let message_file = message_folder[Math.floor(Math.random() * message_folder.length)]
+      message = syncReadFile('messages/' + message_file)
+      last_message = message_file
+      
+      // If the mode is 1 (sort messages, send all at once)
+    } else if(config.multiple_messages.mode == 1){
+      // assing the array to "message" (handled in sendToChannel)
+      message = message_folder.sort()
     }
-    // choose a random message file
-    let message_file = message_folder[Math.floor(Math.random() * message_folder.length)]
-    message = syncReadFile('messages/' + message_file)
-    last_message = message_file
   } else {
     message = syncReadFile("message.txt")
   }
@@ -158,7 +188,7 @@ async function sendMessages() {
     try {
       // Get the channel info used in logs
       const { channel_name, guild_name } = await getChannelInfo(config.channels[i])
-      sendToChannel(config.channels[i], message, channel_name, guild_name
+      sendToChannel(config.channels[i], message, channel_name, guild_name)
                     
       if(config.wait_between_messages.enabled){
         // wait between individual messages

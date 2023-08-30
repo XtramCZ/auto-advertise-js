@@ -9,7 +9,7 @@ default:
     maximum_interval: 70 # Maximum interval in minutes (Default: 70)
 
   wait_between_messages:
-    enabled: false # If set to true, the script waits between individual messages (Default: false)
+    enabled: false # If set to true, the script waits between channels. Set this to true if you're getting rate limited (Default: false)
     minimum_interval: 3 # Maximum interval in seconds (Default: 3)
     maximum_interval: 5 # Maximum interval in seconds (Default: 5)
 
@@ -25,8 +25,12 @@ default:
     end_time: 22 # End hour (0-23, Default: 22) 
     
   wait_before_start: 0 # How many minutes to wait before starting the script (Default: 0)
-  multiple_messages: false # If set to true, the script will choose random .txt message file from /messages/ (Default: false)
-  debug_mode: false # If set to true, you will get a log in the console every time a message is sent (Default: false)
+
+  multiple_messages: 
+    enabled: true # If set to true, the script will choose random .txt message file from /messages/ (Default: false)
+    mode: 0 # 0 - choose random message file | 1 - sorts the messages (message1.txt, message2.txt etc), sends them all into one channel (Default: 0)
+
+  debug_mode: true # If set to true, you will get a log in the console every time a message is sent (Default: false)
   channels: # Channels where to send the message
     - 'xxxxxxxxxxxxxxxxxxx'
     - 'xxxxxxxxxxxxxxxxxxx' # etc
