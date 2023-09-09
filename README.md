@@ -3,7 +3,7 @@
 
 AutoAd is a tool for auto advertising your services in discord market channels.
 
-### Python version [here](https://github.com/XtramCZ/auto-advertise-js)
+### Python version [here](https://github.com/XtramCZ/auto-advertise-py)
 
 ## Installation
 ```bash
