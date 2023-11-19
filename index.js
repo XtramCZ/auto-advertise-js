@@ -71,8 +71,8 @@ async function getChannelInfo(channel_id){
   const channel = await axios.get(`https://discord.com/api/v9/channels/${channel_id}`, headers)
   const guild = await axios.get(`https://discord.com/api/v9/guilds/${channel.data.guild_id}`, headers)
 
-  channel_name = channel.data?.name ?? channel_id
-  guild_name = guild.data?.name ?? "Unknown guild"
+  channel_name = channel && channel.data && channel.data.name ? channel.data.name : channel_id
+  guild_name = guild && guild.data && guild.data.name ? guild.data.name : "Unknown guild"
 
   return {channel_name, guild_name}
 }
@@ -81,7 +81,7 @@ async function checkDoublePosting(channel_id, number){
   const response = await axios.get(`https://discord.com/api/v9/channels/${channel_id}/messages?limit=${number}`, headers)
   for(let i = 0; i < number; i++){
     // if any of the last x messages are posted by you
-    if(response.data[i]?.author.id == user_id){
+    if(response.data[i] && response.data[i].author.id == user_id){
       return false
     }
   }
@@ -144,12 +144,12 @@ console.clear()
 
 process.title = "Auto Advertiser - Made by XtramCZ"
 console.log(color.red(`
-     █████╗ ██╗   ██╗████████╗ ██████╗      █████╗ ██████╗ 
-    ██╔══██╗██║   ██║╚══██╔══╝██╔═══██╗    ██╔══██╗██╔══██╗
-    ███████║██║   ██║   ██║   ██║   ██║    ███████║██║  ██║
-    ██╔══██║██║   ██║   ██║   ██║   ██║    ██╔══██║██║  ██║
-    ██║  ██║╚██████╔╝   ██║   ╚██████╔╝    ██║  ██║██████╔╝
-    ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝     ╚═╝  ╚═╝╚═════╝ 
+     â–â–â–â–â–â•— â–â–â•—   â–â–â•—â–â–â–â–â–â–â–â–â•— â–â–â–â–â–â–â•—      â–â–â–â–â–â•— â–â–â–â–â–â–â•— 
+    â–â–â•”â•â•â–â–â•—â–â–â•‘   â–â–â•‘â•šâ•â•â–â–â•”â•â•â•ťâ–â–â•”â•â•â•â–â–â•—    â–â–â•”â•â•â–â–â•—â–â–â•”â•â•â–â–â•—
+    â–â–â–â–â–â–â–â•‘â–â–â•‘   â–â–â•‘   â–â–â•‘   â–â–â•‘   â–â–â•‘    â–â–â–â–â–â–â–â•‘â–â–â•‘  â–â–â•‘
+    â–â–â•”â•â•â–â–â•‘â–â–â•‘   â–â–â•‘   â–â–â•‘   â–â–â•‘   â–â–â•‘    â–â–â•”â•â•â–â–â•‘â–â–â•‘  â–â–â•‘
+    â–â–â•‘  â–â–â•‘â•šâ–â–â–â–â–â–â•”â•ť   â–â–â•‘   â•šâ–â–â–â–â–â–â•”â•ť    â–â–â•‘  â–â–â•‘â–â–â–â–â–â–â•”â•ť
+    â•šâ•â•ť  â•šâ•â•ť â•šâ•â•â•â•â•â•ť    â•šâ•â•ť    â•šâ•â•â•â•â•â•ť     â•šâ•â•ť  â•šâ•â•ťâ•šâ•â•â•â•â•â•ť 
 
     `), 'by XtramCZ'
 )
