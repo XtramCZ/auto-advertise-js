@@ -1,4 +1,5 @@
 ## AutoAd.js
+## ⛔ Project abandoned, feel free to make PRs
 ### Warning: This is a selfbot and is against discord's TOS
 
 AutoAd is a tool for auto advertising your services in discord market channels.
